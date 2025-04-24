@@ -64,14 +64,154 @@ const todosTemplate = [
 ];
 
 export const App = () => {
-  const [todos, setTodos] = React.useState([]);
+  const getSavedTodos = () => {
+    const savedTodos = localStorage.getItem('todos');
+    return savedTodos ? JSON.parse(savedTodos) : todosTemplate;
+  };
+
+  const [todos, setTodos] = React.useState(getSavedTodos());
+  const [searchTerm, setSearchTerm] = React.useState(
+    localStorage.getItem('searchTerm') || '',
+  );
+  const [filter, setFilter] = React.useState(
+    localStorage.getItem('filter') || 'all',
+  );
+  const [currentPage, setCurrentPage] = React.useState(
+    parseInt(localStorage.getItem('currentPage'), 10) || 1,
+  );
+  const tasksPerPage = 10;
+  React.useEffect(() => {
+    localStorage.setItem('todos', JSON.stringify(todos));
+  }, [todos]);
+
+  React.useEffect(() => {
+    localStorage.setItem('searchTerm', searchTerm);
+  }, [searchTerm]);
+
+  React.useEffect(() => {
+    localStorage.setItem('filter', filter);
+  }, [filter]);
+
+  React.useEffect(() => {
+    localStorage.setItem('currentPage', currentPage.toString());
+  }, [currentPage]);
+
+  // add new task
+  const addTodo = (label) => {
+    if (label.trim() !== '') {
+      const newTodo = {
+        id: todos.length > 0
+          ? Math.max(...todos.map((todo) => todo.id)) + 1
+          : 0,
+        label,
+        checked: false,
+      };
+      setTodos([...todos, newTodo]);
+    }
+  };
+
+  const toggleTodo = (id) => {
+    setTodos(
+      todos.map((todo) => (
+        todo.id === id ? { ...todo, checked: !todo.checked } : todo
+      )),
+    );
+  };
+
+  const deleteTodo = (id) => {
+    setTodos(todos.filter((todo) => todo.id !== id));
+  };
+
+  const filteredTodos = todos
+    .filter((todo) => (
+      todo.label.toLowerCase().includes(searchTerm.toLowerCase())
+    ))
+    .filter((todo) => {
+      if (filter === 'completed') { return todo.checked; }
+      if (filter === 'incomplete') { return !todo.checked; }
+      return true;
+    });
+
+  const totalPages = Math.ceil(filteredTodos.length / tasksPerPage);
+  const indexOfLastTask = currentPage * tasksPerPage;
+  const indexOfFirstTask = indexOfLastTask - tasksPerPage;
+  const currentTasks = filteredTodos.slice(indexOfFirstTask, indexOfLastTask);
+
+  React.useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, filter]);
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
+  const Pagination = () => {
+    const pageNumbers = [];
+    for (let i = 1; i <= totalPages; i += 1) {
+      pageNumbers.push(i);
+    }
+    if (filteredTodos.length <= tasksPerPage) {
+      return null;
+    }
+    return (
+      <div className="pagination">
+        <button
+          type="button"
+          onClick={() => handlePageChange(currentPage - 1)}
+          disabled={currentPage === 1}
+          className="pagination-button"
+        >
+          Previous
+        </button>
+        <div className="page-numbers">
+          {pageNumbers.map((number) => (
+            <button
+              key={number}
+              type="button"
+              onClick={() => handlePageChange(number)}
+              className={`page-number ${currentPage === number ? 'active' : ''}`}
+            >
+              {number}
+            </button>
+          ))}
+        </div>
+        <button
+          type="button"
+          onClick={() => handlePageChange(currentPage + 1)}
+          disabled={currentPage === totalPages}
+          className="pagination-button"
+        >
+          Next
+        </button>
+      </div>
+    );
+  };
 
   return (
     <div className="root">
-      <TodosContext.Provider value={{ todos }}>
+      <h1>React Todo App</h1>
+      <TodosContext.Provider
+        value={{
+          todos: currentTasks,
+          addTodo,
+          toggleTodo,
+          deleteTodo,
+          searchTerm,
+          setSearchTerm,
+          filter,
+          setFilter,
+          allTodos: todos,
+          pagination: {
+            currentPage,
+            totalPages,
+            handlePageChange,
+          },
+        }}
+      >
+        <TodoForm />
         <TodoList />
         <TodoResults />
-        <TodoForm />
+        <Pagination />
       </TodosContext.Provider>
     </div>
   );

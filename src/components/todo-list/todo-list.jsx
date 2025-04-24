@@ -4,18 +4,18 @@ import { TodosContext } from '../../todo-context';
 import './todo-list.scss';
 
 export const TodoList = () => {
-  const { todos, setTodos } = React.useContext(TodosContext);
+  const { todos, toggleTodo, deleteTodo } = React.useContext(TodosContext);
 
   const handleDelete = (id) => {
-    // Fix the app to delete a task
+    deleteTodo(id);
   };
 
   const toggleCheck = (id) => {
-    // Fix the app to mark a task as completed
+    toggleTodo(id);
   };
 
   const handleKeyUp = (e, id) => {
-    if (e.keyCode === 13) {
+    if (e.key === 'Enter') {
       toggleCheck(id);
     }
   };
