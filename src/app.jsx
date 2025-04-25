@@ -79,6 +79,8 @@ export const App = () => {
   const [currentPage, setCurrentPage] = React.useState(
     parseInt(localStorage.getItem('currentPage'), 10) || 1,
   );
+  const [editingTodoId, setEditingTodoId] = React.useState(null);
+  const [editInput, setEditInput] = React.useState('');
   const tasksPerPage = 10;
   React.useEffect(() => {
     localStorage.setItem('todos', JSON.stringify(todos));
@@ -96,7 +98,6 @@ export const App = () => {
     localStorage.setItem('currentPage', currentPage.toString());
   }, [currentPage]);
 
-  // add new task
   const addTodo = (label) => {
     if (label.trim() !== '') {
       const newTodo = {
@@ -121,7 +122,20 @@ export const App = () => {
   const deleteTodo = (id) => {
     setTodos(todos.filter((todo) => todo.id !== id));
   };
+  const startEditing = (id, currentLabel) => {
+    setEditingTodoId(id);
+    setEditInput(currentLabel);
+  };
 
+  const saveEdit = (id) => {
+    setTodos(
+      todos.map((todo) => (
+        todo.id === id ? { ...todo, label: editInput } : todo
+      )),
+    );
+    setEditingTodoId(null);
+    setEditInput('');
+  };
   const filteredTodos = todos
     .filter((todo) => (
       todo.label.toLowerCase().includes(searchTerm.toLowerCase())
@@ -206,6 +220,12 @@ export const App = () => {
             totalPages,
             handlePageChange,
           },
+          editingTodoId,
+          setEditingTodoId,
+          editInput,
+          setEditInput,
+          startEditing,
+          saveEdit,
         }}
       >
         <TodoForm />

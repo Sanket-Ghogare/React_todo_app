@@ -15,4 +15,10 @@ export const TodosContext = createContext({
     totalPages: 1,
     handlePageChange: () => {},
   },
+  editingTodoId: null,
+  setEditingTodoId: () => {},
+  editInput: '',
+  setEditInput: () => {},
+  startEditing: () => {},
+  saveEdit: () => {},
 });

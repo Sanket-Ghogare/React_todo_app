@@ -26,4 +26,45 @@
     color: #888;
     padding: 20px 0;
   }
+
+  .todo-item {
+    display: flex;
+    align-items: center;
+    position: relative;
+    padding: 8px 0;
+    margin-bottom: 8px;
+    width: 100%;
+  }
+  
+  .todo-item input[type="checkbox"] {
+    margin-right: 10px;
+    flex-shrink: 0;
+  }
+  
+  .todo-item span {
+    flex-grow: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-right: 140px;
+  }
+  
+  .todo-item input[type="text"] {
+    flex-grow: 1;
+    padding: 4px;
+    font-size: 1rem;
+    margin-right: 140px;
+  }
+  
+  .todo-item button {
+    position: absolute;
+    right: 0;
+  }
+  
+  .todo-item button:last-child {
+    right: 0;
+  }
+  
+  .todo-item button:nth-last-child(2) {
+    right: 60px;
+  }
 }

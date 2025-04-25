@@ -77,3 +77,7 @@ We’re looking forward to seeing what you come up with.
 Good luck and have fun!
 
 ---
+
+
+<!-- // run below command for running the server -->
+set NODE_OPTIONS=--openssl-legacy-provider
